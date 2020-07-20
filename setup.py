@@ -5,7 +5,7 @@ import sys
 
 setup(
     name="xyz-mytraining",
-    version="0.0.1",
+    version="0.0.3",
     author="szuprefix",
     author_email="szuprefix@126.com",
     description="mytraining app",

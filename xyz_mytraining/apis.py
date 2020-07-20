@@ -1,8 +1,10 @@
 # -*- coding:utf-8 -*-
 from __future__ import division
+
+from django.db import DataError
 from xyz_restful.mixins import UserApiMixin, BatchActionMixin
 from . import models, serializers
-from rest_framework import viewsets, decorators, response
+from rest_framework import viewsets, decorators, response, status
 from xyz_restful.decorators import register
 
 
@@ -37,9 +39,13 @@ class CourseViewSet(UserApiMixin, BatchActionMixin, viewsets.ModelViewSet):
         course = self.get_object()
         data = request.data
         the_date = data.pop('the_date')
-        course.withdraw(the_date, **data)
-        s = self.get_serializer(instance=course)
-        return response.Response(s.data)
+        try:
+            course.withdraw(the_date, **data)
+            s = self.get_serializer(instance=course)
+            return response.Response(s.data)
+        except DataError, e:
+            return response.Response({'detail': e.message}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
 
 
     # @decorators.list_route(['get'])
