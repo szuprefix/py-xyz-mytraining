@@ -21,11 +21,11 @@ class CourseViewSet(UserApiMixin, BatchActionMixin, viewsets.ModelViewSet):
     }
     ordering_fields = ('is_active', 'name', 'create_time')
 
-    @decorators.list_route(['POST'])
+    @decorators.action(['POST'], detail=False)
     def batch_active(self, request):
         return self.do_batch_action('is_active', True)
 
-    @decorators.detail_route(['POST'])
+    @decorators.action(['POST'], detail=True)
     def deposit(self, request, pk):
         course = self.get_object()
         data = request.data
@@ -34,7 +34,7 @@ class CourseViewSet(UserApiMixin, BatchActionMixin, viewsets.ModelViewSet):
         s = self.get_serializer(instance=course)
         return response.Response(s.data)
 
-    @decorators.detail_route(['POST'])
+    @decorators.action(['POST'], detail=True)
     def withdraw(self, request, pk):
         course = self.get_object()
         data = request.data
@@ -43,7 +43,7 @@ class CourseViewSet(UserApiMixin, BatchActionMixin, viewsets.ModelViewSet):
             course.withdraw(the_date, **data)
             s = self.get_serializer(instance=course)
             return response.Response(s.data)
-        except DataError, e:
+        except DataError as e:
             return response.Response({'detail': e.message}, status=status.HTTP_406_NOT_ACCEPTABLE)
 
 
